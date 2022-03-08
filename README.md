@@ -19,3 +19,15 @@ MonoBehaviour
 ```C#
 var pool = new ObjectPool<HogeMonoBehaviour>(() => Instantiate(hoge));
 ```
+
+# in the future
+
+## AsyncObjectPool
+
+using UniTask.
+
+```C#
+var pool = new ObjectPool<HogeMonoBehaviour>(() => await HogeFactory.CreateAsync());
+await pool.PreLoadAsync();
+var obj = await pool.TakeAsync();
+```
