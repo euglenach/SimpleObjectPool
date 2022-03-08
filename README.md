@@ -27,7 +27,7 @@ var pool = new ObjectPool<HogeMonoBehaviour>(() => Instantiate(hoge));
 using UniTask.
 
 ```C#
-var pool = new ObjectPool<HogeMonoBehaviour>(() => await HogeFactory.CreateAsync());
+var pool = new AsyncObjectPool<HogeMonoBehaviour>(() => await HogeFactory.CreateAsync());
 await pool.PreLoadAsync();
 var obj = await pool.TakeAsync();
 ```
