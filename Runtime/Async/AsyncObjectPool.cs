@@ -5,7 +5,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 
 namespace SimpleObjectPool.Async{
-    public class AsyncObjectPool<T> : IUniTaskAsyncDisposable where T : IAsyncPooled{
+    public class AsyncObjectPool<T> : IDisposable where T : IPooled{
         private readonly Func<CancellationToken,UniTask<T>> createInstance;
         private ObjectPoolParameter parameter;
         private Queue<T> pool = new Queue<T>();
@@ -43,7 +43,7 @@ namespace SimpleObjectPool.Async{
         /// <exception cref="ObjectDisposedException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public async UniTask ReleaseAsync(T instance,CancellationToken cancellationToken = default){
+        public void Release(T instance){
             if(disposed) throw new ObjectDisposedException("ObjectPool was already disposed.");
             if(instance == null) throw new ArgumentNullException();
 
@@ -53,7 +53,7 @@ namespace SimpleObjectPool.Async{
                 throw new InvalidOperationException("Reached max pool size.");
             }
 
-            await instance.OnReleaseAsync(cancellationToken);
+            instance.OnRelease();
             pool.Enqueue(instance);
         }
 
@@ -68,7 +68,7 @@ namespace SimpleObjectPool.Async{
             if(pool == null) pool = new Queue<T>();
 
             var instance = pool.Count > 0? pool.Dequeue() : await createInstance(cancellationToken);
-            instance.OnTakeAsync(cancellationToken);
+            instance.OnTake();
             return instance;
         }
 
@@ -76,16 +76,18 @@ namespace SimpleObjectPool.Async{
         /// Empty the pool.
         /// </summary>
         /// <exception cref="ObjectDisposedException"></exception>
-        public async UniTask ClearAsync(CancellationToken cancellationToken = default){
+        public void Clear(){
             if(disposed) throw new ObjectDisposedException("ObjectPool was already disposed.");
             if(pool == null) return;
-            
-            await UniTask.WhenAll(pool.Select(item => item.OnClearAsync(cancellationToken)));
-            pool.Clear();
+
+            while(pool.Count != 0){
+                var instance = pool.Dequeue();
+                instance.OnClear();
+            }
         }
 
-        public async UniTask DisposeAsync(){
-            await ClearAsync();
+        public void Dispose(){
+            Clear();
             disposed = true;
         }
     }
