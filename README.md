@@ -20,8 +20,6 @@ MonoBehaviour
 var pool = new ObjectPool<HogeMonoBehaviour>(() => Instantiate(hoge));
 ```
 
-# in the future
-
 ## AsyncObjectPool
 
 using UniTask.
