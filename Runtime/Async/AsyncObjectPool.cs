@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 
 namespace SimpleObjectPool.Async{
     public class AsyncObjectPool<T> : IUniTaskAsyncDisposable where T : IAsyncPooled{
-        private Func<CancellationToken,UniTask<T>> createInstance;
+        private readonly Func<CancellationToken,UniTask<T>> createInstance;
         private ObjectPoolParameter parameter;
         private Queue<T> pool = new Queue<T>();
         public int Count => pool?.Count ?? 0;
