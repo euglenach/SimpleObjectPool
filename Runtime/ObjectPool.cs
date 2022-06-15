@@ -23,12 +23,14 @@ namespace SimpleObjectPool
         /// </summary>
         /// <exception cref="ObjectDisposedException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="NullReferenceException"></exception>
         public void PreLoad(ObjectPoolParameter parameter = null)
         {
             if (disposed) throw new ObjectDisposedException("ObjectPool was already disposed.");
             if(pool.Count != 0) throw new InvalidOperationException("The object pool has already been initialized.");
 
             if(parameter != null) this.parameter = parameter;
+			if(parameter == null) throw new NullReferenceException("Parameter undefined.");
 
             var count = this.parameter.preLoadCount;
             for(var i = 0; i < count; i++)
@@ -95,8 +97,8 @@ namespace SimpleObjectPool
 
         public void Dispose()
         {
-            disposed = true;
             Clear();
+            disposed = true;
         }
     }
 }
