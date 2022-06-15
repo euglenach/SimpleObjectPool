@@ -7,7 +7,7 @@ namespace SimpleObjectPool
     {
         private Func<T> createInstance;
         private ObjectPoolParameter parameter;
-        private Queue<T> pool;
+        private Queue<T> pool = new Queue<T>();
         public int Count => pool?.Count ?? 0;
         public int MaxPoolCount => parameter?.maxPoolCount ?? 0;
         private bool disposed;
@@ -54,7 +54,7 @@ namespace SimpleObjectPool
             
             if (pool == null) pool = new Queue<T>();
             
-            if (parameter.maxPoolCount < 1 || parameter.maxPoolCount == pool.Count + 1)
+            if (parameter.maxPoolCount < 1 || parameter.maxPoolCount < pool.Count + 1)
             {
                 throw new InvalidOperationException("Reached max pool size.");
             }
